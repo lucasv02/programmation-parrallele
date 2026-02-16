@@ -73,7 +73,7 @@ class Analyse:
                 
         return resultats_sp
 
-    def affichage(self, resultats_sp):
+    def affichage_forte(self, resultats_sp):
 
         if not resultats_sp:
             print("Aucune donnée Sp à afficher.")
@@ -96,6 +96,103 @@ class Analyse:
         plt.xticks(processus)
         
         print("Affichage du graphique...")
+        plt.show()
+
+    def affichage_faible(self, resultats_sp):
+
+        if not resultats_sp:
+            print("Aucune donnée Sp à afficher.")
+            return
+
+        # Trier par nombre de processus
+        processus = sorted(resultats_sp.keys())
+        valeurs_sp = [resultats_sp[p] for p in processus]
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(processus, valeurs_sp, marker='o', linestyle='-', color='b')
+
+        plt.xlabel('Nombre de processus (P)')
+        plt.ylabel('Sp (T1/TP)')
+        plt.title('Performance Sp en fonction du nombre de processus')
+        plt.grid(True)
+
+        ax = plt.gca()
+        ax.set_aspect('auto')
+        ax.set_ylim(0, 1.2)
+        plt.xticks(processus)
+
+        print("Affichage du graphique...")
+        plt.show()
+
+    def affichage_multi_forte(self, chemins_fichiers):
+        plt.figure(figsize=(10, 6))
+        
+        tous_processus = set()
+        
+        for chemin in chemins_fichiers:
+            self.lecture(chemin)
+            medianes = self.mediane_par_processus()
+            sp = self.calculer_sp(medianes)
+            
+            if not sp:
+                continue
+                
+            processus = sorted(sp.keys())
+            valeurs_sp = [sp[p] for p in processus]
+            tous_processus.update(processus)
+            
+            import os
+            label = os.path.basename(chemin)
+            plt.plot(processus, valeurs_sp, marker='o', linestyle='-', label=label)
+
+        plt.xlabel('Nombre de processus (P)')
+        plt.ylabel('Sp (T1/TP)')
+        plt.title('Performance Sp (Forte) - Multiples fichiers')
+        plt.grid(True)
+        plt.legend()
+
+        ax = plt.gca()
+        ax.set_aspect('equal', adjustable='box')
+        if tous_processus:
+            plt.xticks(sorted(list(tous_processus)))
+        
+        print("Affichage du graphique multi-forte...")
+        plt.show()
+
+    def affichage_multi_faible(self, chemins_fichiers):
+        plt.figure(figsize=(10, 6))
+        
+        tous_processus = set()
+        
+        for chemin in chemins_fichiers:
+            self.lecture(chemin)
+            medianes = self.mediane_par_processus()
+            sp = self.calculer_sp(medianes)
+            
+            if not sp:
+                continue
+                
+            processus = sorted(sp.keys())
+            valeurs_sp = [sp[p] for p in processus]
+            tous_processus.update(processus)
+            
+            import os
+            label = os.path.basename(chemin)
+            plt.plot(processus, valeurs_sp, marker='o', linestyle='-', label=label)
+
+        plt.xlabel('Nombre de processus (P)')
+        plt.ylabel('Sp (T1/TP)')
+        plt.title('Performance Sp (Faible) - Multiples fichiers')
+        plt.grid(True)
+        plt.legend()
+
+        ax = plt.gca()
+        ax.set_aspect('auto')
+        ax.set_ylim(0, 1.2)
+        if tous_processus:
+            plt.xticks(sorted(list(tous_processus)))
+
+        print("Affichage du graphique multi-faible...")
         plt.show()
 
 
