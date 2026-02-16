@@ -70,7 +70,7 @@ public class MasterSocket {
 
        while (message_repeat.equals("y")){
 
-	   startTime = System.currentTimeMillis();
+	   startTime = System.nanoTime();
 	   // initialize workers
 	   for(int i = 0 ; i < numWorkers ; i++) {
 	       writer[i].println(message_to_send);          // send a message to each worker
@@ -88,7 +88,7 @@ public class MasterSocket {
 	   }
 	   pi = 4.0 * total / totalCount / numWorkers;
 
-	   stopTime = System.currentTimeMillis();
+	   stopTime = System.nanoTime();
 
 	   System.out.println("\nPi : " + pi );
 	   System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI) +"\n");
