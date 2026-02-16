@@ -6,7 +6,7 @@ def main():
 
     # Chemin du fichier CSV situé dans le même dossier que ce script
     base_dir = os.path.dirname(__file__)
-    csv_path = os.path.join(base_dir, 'socket_result.csv')
+    csv_path = os.path.join(base_dir, 'fichier3.csv')
 
     a = Analyse()
     a.lecture(chemin=csv_path, delim=';')

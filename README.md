@@ -48,6 +48,10 @@ Pour la mesure du temps et l'exploitation des données, on va utiliser dans un p
 nous allons utiliser Python pour l'exploitation des données. 
 Comme indiqué plus haut, nous allons nous intéresser à la scalabilité faible et la scalabilité forte, l'idée est de calculer le speedup et l'efficacité de nos implémentations.
 
+Par ailleurs, les données ne seront pas complétement bonnes car lors de l'appel de la fonction, on utilise un for et donc on n'appelle pas complétement de nouveau la fonction. 
+
+Nous avons aussi modifier l'unité de temps pour la passer en nano secondes afin de pouvoir gagner en précision. 
+
 ### Scalabilité forte
 
 La scalabilité forte mesure comment le temps d'exécution diminue avec l'augmentation du nombre de threads pour une taille de problème fixe.
@@ -58,6 +62,11 @@ La scalabilité forte mesure comment le temps d'exécution diminue avec l'augmen
 | 2 | 520 | 1.92 | 96% |
 | 4 | 280 | 3.57 | 89% |
 | 8 | 160 | 6.25 | 78% |
+
+Dans notre expérience de scalabilité forte, nous avons pris un ntotal de 20 millions pour les processus suivants 1,2,3,4,5,6,7,8,9. Nous pouvons constater que entre 4 et processus, cela chutte énormément, cela est du à l'architecture particulière des processus Apple. On constate aussi que des qu'on as passer les 4 coeurs physiques, cela diminue rapidement. 
+
+![Courbe de la scalabilité forte](./Images/fort.png "Courbe de scalabilité forte")
+
 
 ### Scalabilité faible
 
@@ -70,6 +79,4 @@ La scalabilité faible mesure comment le temps d'exécution varie quand on augme
 | 4 | 4M | 1025 |
 | 8 | 8M | 1050 |
 
-## Pi.java 
-
-Dans un premier temps, nous allons analyser effectuer des mesures sur 
+![Courbe de la scalabilité faible](./Images/faible.png "Courbe de scalabilité faible")
