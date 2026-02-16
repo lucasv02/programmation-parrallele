@@ -17,11 +17,11 @@ public class MasterSocket {
     public static void main(String[] args) throws Exception {
 
 	// MC parameters
-	int totalCount = 16000000; // total number of throws on a Worker
+	int nTotal = 16000000; // total number of throws
 	int total = 0; // total number of throws inside quarter of disk
 	double pi; 
-
 	int numWorkers = maxServer;
+	boolean isStrongScalability = true;
 	BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 	String s; // for bufferRead
 
@@ -34,6 +34,13 @@ public class MasterSocket {
 	    s = bufferRead.readLine();
 	    numWorkers = Integer.parseInt(s);
 	    System.out.println(numWorkers);
+	    
+	    System.out.println("Scalabilité forte (s) ou Scalabilité faible (w) ? ");
+	    s = bufferRead.readLine();
+	    if (s.equalsIgnoreCase("w")) {
+		isStrongScalability = false;
+	    }
+	    System.out.println("Scalability: " + (isStrongScalability ? "Strong" : "Weak"));
 	}
 	catch(IOException ioE){
 	   ioE.printStackTrace();
@@ -61,12 +68,27 @@ public class MasterSocket {
 	   writer[i] = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sockets[i].getOutputStream())),true);
        }
 
+       int totalCountPerWorker;
+       if (isStrongScalability) {
+	   totalCountPerWorker = nTotal / numWorkers;
+       } else {
+	   totalCountPerWorker = nTotal;
+       }
+       
        String message_to_send;
-       message_to_send = String.valueOf(totalCount);
+       message_to_send = String.valueOf(totalCountPerWorker);
 
        String message_repeat = "y";
 
        long stopTime, startTime;
+       
+       File csvFile = new File("./Fichier/socket_result.csv");
+       boolean fileExists = csvFile.exists();
+       PrintWriter csvWriter = new PrintWriter(new BufferedWriter(new FileWriter(csvFile, true)));
+       
+       if (!fileExists || csvFile.length() == 0) {
+           csvWriter.println("Notal;TotalCount;P;TPS;Erreur");
+       }
 
        while (message_repeat.equals("y")){
 
@@ -83,21 +105,25 @@ public class MasterSocket {
 	   }
 	   
 	   // compute PI with the result of each workers
+	   total = 0; // Reset total to 0 for each repetition
 	   for(int i = 0 ; i < numWorkers ; i++) {
 	       total += Integer.parseInt(tab_total_workers[i]);
 	   }
-	   pi = 4.0 * total / totalCount / numWorkers;
+	   pi = 4.0 * total / totalCountPerWorker / numWorkers;
 
 	   stopTime = System.nanoTime();
+	   
+	   System.out.println("PI = " + pi);
 
-	   System.out.println("\nPi : " + pi );
-	   System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI) +"\n");
-	   
-	   System.out.println("Ntot: " + totalCount*numWorkers);
-	   System.out.println("Available processors: " + numWorkers);
-	   System.out.println("Time Duration (ms): " + (stopTime - startTime) + "\n");
-	   
-	   System.out.println( (Math.abs((pi - Math.PI)) / Math.PI) +" "+ totalCount*numWorkers +" "+ numWorkers +" "+ (stopTime - startTime));
+	   // Écriture dans le CSV : Notal;TotalCount;P;TPS;Erreur
+	   StringBuilder line = new StringBuilder();
+	   line.append(totalCountPerWorker * numWorkers).append(";"); // Notal (total de points pour tous les workers)
+	   line.append(totalCountPerWorker).append(";");             // TotalCount (par worker)
+	   line.append(numWorkers).append(";");            // P (nombre de processus/workers)
+	   line.append(stopTime - startTime).append(";");  // TPS (durée en nano-secondes)
+	   line.append(Math.abs((pi - Math.PI)) / Math.PI); // Erreur
+	   csvWriter.println(line.toString());
+	   csvWriter.flush();
 
 	   System.out.println("\n Repeat computation (y/N): ");
 	   try{
@@ -116,5 +142,6 @@ public class MasterSocket {
 	   writer[i].close();
 	   sockets[i].close();
        }
+       csvWriter.close();
    }
 }
