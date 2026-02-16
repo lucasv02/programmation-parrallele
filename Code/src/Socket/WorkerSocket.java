@@ -33,9 +33,19 @@ public class WorkerSocket {
 		System.out.println("Server receives totalCount = " +  str);
 		
 		// compute
-		System.out.println("TODO : compute Monte Carlo and send total");
+		int totalIterations = Integer.parseInt(str);
+		long circleCount = 0;
+		java.util.Random random = new java.util.Random();
+		for (int j = 0; j < totalIterations; j++) {
+		    double x = random.nextDouble();
+		    double y = random.nextDouble();
+		    if ((x * x + y * y) < 1) {
+			circleCount++;
+		    }
+		}
+		System.out.println("Computation finished. CircleCount = " + circleCount);
 
-	        pWrite.println(str);         // send number of points in quarter of disk
+	        pWrite.println(String.valueOf(circleCount));
 	    }else{
 		isRunning=false;
 	    }	    
